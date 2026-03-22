@@ -1,0 +1,56 @@
+{{- if empty .Values.resources }}
+{{- fail "resources cannot be empty" }}
+{{- end }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ default .Values.appName .Values.containerName }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.listeningPort }}
+          {{- with .Values.env }}
+          env:
+            {{- range . }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 2 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            httpGet:
+              path: {{ .path }}
+              port: {{ default $.Values.listeningPort .port }}
+            initialDelaySeconds: 300
+            timeoutSeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+  {{ if .Values.rollingUpdate.enabled }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  {{ end }}
+      

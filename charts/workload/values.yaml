@@ -1,0 +1,36 @@
+appName: ""
+replicas: 1
+containerName: ""
+listeningPort: 80
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: "Always"
+
+env: []
+envFrom: []
+
+resources: {}
+
+livenessProbe:
+  path: /healthz
+  port: 80
+
+rollingUpdate:
+  enabled: true
+
+configMap:
+  enabled: false
+  values: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

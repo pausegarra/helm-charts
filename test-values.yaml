@@ -1,0 +1,31 @@
+appName: "hello"
+
+image:
+  repository: "nginx"
+  tag: "latest"
+
+rollingUpdate:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: test.pausegarra.es
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - test.pausegarra.es
+      secretName: test-pausegarra-es-tls
