@@ -8,6 +8,10 @@ image:
   tag: ""
   pullPolicy: "Always"
 
+imagePullSecrets:
+  enabled: false
+  secrets: []
+
 env: []
 envFrom: []
 

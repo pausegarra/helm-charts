@@ -16,6 +16,12 @@ spec:
       labels:
         app: {{ .Values.appName }}
     spec:
+      {{- if and .Values.imagePullSecrets.enabled (gt (len .Values.imagePullSecrets.secrets) 0) }}
+      imagePullSecrets:
+        {{- range .Values.imagePullSecrets.secrets }}
+        - name: {{ . | quote }}
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ default .Values.appName .Values.containerName }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
