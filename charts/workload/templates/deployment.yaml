@@ -37,7 +37,7 @@ spec:
           {{- end }}
           {{- with .Values.envFrom }}
           envFrom:
-            {{- toYaml . | nindent 2 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:

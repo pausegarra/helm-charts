@@ -5,7 +5,7 @@ listeningPort: 80
 
 image:
   repository: ""
-  tag: ""
+  tag: "latest"
   pullPolicy: "Always"
 
 imagePullSecrets:
