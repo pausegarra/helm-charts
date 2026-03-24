@@ -29,3 +29,18 @@ ingress:
     - hosts:
         - test.pausegarra.es
       secretName: test-pausegarra-es-tls
+
+traefikMiddlewareRedirectRegex:
+  enabled: true
+  redirectIngress:
+    hosts:
+      - host: test.pausegarra.es
+        paths:
+          - path: /
+            pathType: Prefix
+  items:
+    - name: redirect-es-to-com
+      namespace: infra
+      regex: ^https?://((?:[a-zA-Z0-9-]+)\.)?pausegarra\.es(/.*)?$
+      replacement: https://${1}pausegarra.com${2}
+      permanent: true

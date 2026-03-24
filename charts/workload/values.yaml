@@ -38,3 +38,32 @@ ingress:
         - path: /
           pathType: Prefix
   tls: []
+
+traefikMiddlewareRedirectRegex:
+  enabled: false
+  items: []
+  redirectIngress:
+    enabled: true
+    className: ""
+    annotations: {}
+    serviceName: dummy-svc
+    servicePort: 80
+    hosts: []
+    # hosts:
+    #   - host: pausegarra.com
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    tls: []
+  # Example:
+  # items:
+  #   - name: redirect-com-to-es-root-only
+  #     namespace: infra
+  #     regex: ^https?://pausegarra\.com(/.*)?$
+  #     replacement: https://pausegarra.es${1}
+  #     permanent: true
+  #   - name: redirect-blog-com-to-es
+  #     namespace: infra
+  #     regex: ^https?://blog\.pausegarra\.com(/.*)?$
+  #     replacement: https://blog.pausegarra.es${1}
+  #     permanent: true

@@ -1,0 +1,17 @@
+{{- if .Values.traefikMiddlewareRedirectRegex.enabled }}
+{{- range .Values.traefikMiddlewareRedirectRegex.items }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .name }}
+  {{- with .namespace }}
+  namespace: {{ . }}
+  {{- end }}
+spec:
+  redirectRegex:
+    regex: {{ .regex | quote }}
+    replacement: {{ .replacement | quote }}
+    permanent: {{ default true .permanent }}
+{{- end }}
+{{- end }}

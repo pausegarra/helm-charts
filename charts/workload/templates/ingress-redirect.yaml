@@ -1,0 +1,43 @@
+{{- $redirectEnabled := and .Values.traefikMiddlewareRedirectRegex.enabled .Values.traefikMiddlewareRedirectRegex.redirectIngress.enabled (gt (len .Values.traefikMiddlewareRedirectRegex.items) 0) (gt (len .Values.traefikMiddlewareRedirectRegex.redirectIngress.hosts) 0) }}
+{{- if $redirectEnabled }}
+{{- $middlewares := list }}
+{{- range .Values.traefikMiddlewareRedirectRegex.items }}
+{{- $namespace := default $.Release.Namespace .namespace }}
+{{- $middlewares = append $middlewares (printf "%s-%s@kubernetescrd" $namespace .name) }}
+{{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.appName }}-redirect-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ join "," $middlewares | quote }}
+    {{- with .Values.traefikMiddlewareRedirectRegex.redirectIngress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with (default .Values.ingress.className .Values.traefikMiddlewareRedirectRegex.redirectIngress.className) }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.traefikMiddlewareRedirectRegex.redirectIngress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.traefikMiddlewareRedirectRegex.redirectIngress.hosts }}
+    - {{- with .host }}
+      host: {{ . | quote }}
+      {{- end }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $.Values.traefikMiddlewareRedirectRegex.redirectIngress.serviceName }}
+                port:
+                  number: {{ $.Values.traefikMiddlewareRedirectRegex.redirectIngress.servicePort }}
+          {{- end }}
+    {{- end }}
+{{- end }}
