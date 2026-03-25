@@ -27,7 +27,17 @@ spec:
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
+            {{- if gt (len .Values.ports) 0 }}
+            {{- range .Values.ports }}
+            - containerPort: {{ default .port .containerPort }}
+              protocol: {{ default "TCP" .protocol }}
+              {{- with .name }}
+              name: {{ . | quote }}
+              {{- end }}
+            {{- end }}
+            {{- else }}
             - containerPort: {{ .Values.listeningPort }}
+            {{- end }}
           {{- with .Values.env }}
           env:
             {{- range . }}
@@ -40,10 +50,25 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.livenessProbe }}
+          {{- $probePort := .port }}
+          {{- if not $probePort }}
+          {{- if gt (len $.Values.ports) 0 }}
+          {{- $firstPort := index $.Values.ports 0 }}
+          {{- if $firstPort.containerPort }}
+          {{- $probePort = $firstPort.containerPort }}
+          {{- else if $firstPort.targetPort }}
+          {{- $probePort = $firstPort.targetPort }}
+          {{- else }}
+          {{- $probePort = $firstPort.port }}
+          {{- end }}
+          {{- else }}
+          {{- $probePort = $.Values.listeningPort }}
+          {{- end }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: {{ .path }}
-              port: {{ default $.Values.listeningPort .port }}
+              port: {{ $probePort }}
             initialDelaySeconds: 300
             timeoutSeconds: 30
             periodSeconds: 30

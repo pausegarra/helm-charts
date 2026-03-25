@@ -6,8 +6,17 @@ spec:
   selector:
     app: {{ .Values.appName }}
   ports:
+    {{- if gt (len .Values.ports) 0 }}
+    {{- range .Values.ports }}
+    - name: {{ default (printf "port-%v" .port) .name | quote }}
+      protocol: {{ default "TCP" .protocol }}
+      port: {{ .port }}
+      targetPort: {{ default .port .targetPort }}
+    {{- end }}
+    {{- else }}
     - protocol: TCP
       port: {{ .Values.listeningPort }}
       targetPort: {{ .Values.listeningPort }}
+    {{- end }}
   type: ClusterIP
   

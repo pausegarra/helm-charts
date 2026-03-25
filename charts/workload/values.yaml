@@ -2,6 +2,19 @@ appName: ""
 replicas: 1
 containerName: ""
 listeningPort: 80
+ports: []
+# Example:
+# ports:
+#   - name: http
+#     port: 80
+#     targetPort: 8080
+#     containerPort: 8080
+#     protocol: TCP
+#   - name: metrics
+#     port: 9090
+#     targetPort: 9090
+#     containerPort: 9090
+#     protocol: TCP
 
 image:
   repository: ""
@@ -19,7 +32,10 @@ resources: {}
 
 livenessProbe:
   path: /healthz
-  port: 80
+  # Optional. If empty, deployment template falls back to:
+  # 1) first .Values.ports[] using: containerPort > targetPort > port
+  # 2) .Values.listeningPort
+  port: null
 
 rollingUpdate:
   enabled: true
