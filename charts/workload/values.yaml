@@ -27,6 +27,12 @@ imagePullSecrets:
 
 env: []
 envFrom: []
+command: []
+args: []
+# Example:
+# args:
+#   - --hostname=https://auth.pausegarra.es
+#   - --http-enabled=true
 
 resources: {}
 

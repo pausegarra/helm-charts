@@ -26,6 +26,14 @@ spec:
         - name: {{ default .Values.appName .Values.containerName }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             {{- if gt (len .Values.ports) 0 }}
             {{- range .Values.ports }}
