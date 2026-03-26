@@ -57,11 +57,9 @@ spec:
           envFrom:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.livenessProbe }}
-          {{- $probePort := .port }}
-          {{- if not $probePort }}
-          {{- if gt (len $.Values.ports) 0 }}
-          {{- $firstPort := index $.Values.ports 0 }}
+          {{- $probePort := .Values.listeningPort }}
+          {{- if gt (len .Values.ports) 0 }}
+          {{- $firstPort := index .Values.ports 0 }}
           {{- if $firstPort.containerPort }}
           {{- $probePort = $firstPort.containerPort }}
           {{- else if $firstPort.targetPort }}
@@ -69,17 +67,26 @@ spec:
           {{- else }}
           {{- $probePort = $firstPort.port }}
           {{- end }}
-          {{- else }}
-          {{- $probePort = $.Values.listeningPort }}
           {{- end }}
-          {{- end }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
             httpGet:
               path: {{ .path }}
-              port: {{ $probePort }}
+              port: {{ default $probePort .port }}
             initialDelaySeconds: 300
             timeoutSeconds: 30
             periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            httpGet:
+              path: {{ .path }}
+              port: {{ default $probePort .port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
           {{- end }}

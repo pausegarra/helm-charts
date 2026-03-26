@@ -42,6 +42,12 @@ livenessProbe:
   # 1) first .Values.ports[] using: containerPort > targetPort > port
   # 2) .Values.listeningPort
   port: null
+readinessProbe:
+  path: /healthz
+  # Optional. If empty, deployment template falls back to:
+  # 1) first .Values.ports[] using: containerPort > targetPort > port
+  # 2) .Values.listeningPort
+  port: null
 
 rollingUpdate:
   enabled: true
