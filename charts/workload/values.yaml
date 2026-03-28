@@ -65,6 +65,8 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+          # Optional. If empty, ingress template falls back to .Values.listeningPort
+          port: null
   tls: []
 
 traefikMiddlewareRedirectRegex:

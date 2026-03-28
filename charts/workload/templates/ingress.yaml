@@ -29,7 +29,7 @@ spec:
               service:
                 name: {{ $.Values.appName }}-svc
                 port:
-                  number: {{ $.Values.listeningPort }}
+                  number: {{ default $.Values.listeningPort .port }}
           {{- end }}
     {{- end }}
 {{- end }}
